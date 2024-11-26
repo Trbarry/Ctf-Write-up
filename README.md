@@ -25,7 +25,7 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
 - **Inspection du code source :** Découverte du nom d’utilisateur.
   - **Nom d’utilisateur :** `R1ckRul3s`
 
-![Code source username](image/Usernamedanslecodesource.png)
+![Code source username](image/codesource.png)
 
 ---
 
