@@ -1,3 +1,4 @@
+![wallpaper](image/fondd'ecran.png)
 # **CTF Write-Up: Pickle Rick**
 
 ## **Description**
@@ -22,32 +23,71 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
 ---
 
 ### **2. Exploration de la page web**
-- **Inspection du code source :** Découverte du nom d’utilisateur.
+- **Inspection du code source :** J’ai analysé le code source de la page web et trouvé un indice important :
   - **Nom d’utilisateur :** `R1ckRul3s`
 
-![Code source username](image/codesource.png)
+![Nom d'utilisateur trouvé dans le code source](image/codesource.png)
 
 ---
 
 ### **3. Recherche des répertoires cachés**
-- **Dirb scan :**
-  ```bash
-  dirb http://<IP-CIBLE>/ <WORDLIST>
-  ```
-  - **Résultats :** Découverte de `/robots.txt` contenant `Wubbalubbadubdub`.
 
-![Dirb results](image/dirbenumeration.png)
+#### **Étape 1 : Utilisation de Gobuster**
+J’ai commencé avec **Gobuster** pour découvrir les répertoires et fichiers cachés sur le serveur. Voici la commande que j’ai utilisée :
+
+```bash
+gobuster dir -u http://<IP-CIBLE>/ -w <wordlist>
+```
+
+- **Résultat :** Gobuster n’a pas trouvé de répertoires exploitables. J’ai réalisé que le problème pouvait venir de la liste de mots utilisée (`wordlist`) qui n’était peut-être pas adaptée au contexte.
+
+![Résultats Gobuster](image/Gobusterenumeration.png)
 
 ---
 
-### **4. Utilisation de Nikto**
-- **Commande :**
-  ```bash
-  nikto -h http://<IP-CIBLE>/
-  ```
-  - **Résultats :** Découverte de `/login.php`.
+#### **Étape 2 : Passer à Dirb**
+Pour vérifier si le problème venait de l’outil ou de la liste, j’ai décidé d’utiliser **Dirb**, un autre outil d’énumération de répertoires. Voici la commande que j’ai utilisée :
 
-![Nikto results](image/nikto.png)
+```bash
+dirb http://<IP-CIBLE>/ <wordlist>
+```
+
+- **Résultat :** Dirb a trouvé plusieurs chemins, notamment un fichier `/robots.txt`.
+
+![Résultats Dirb](image/dirbenumeration.png)
+
+---
+
+#### **Étape 3 : Analyse de `/robots.txt`**
+En accédant au fichier `/robots.txt`, j’ai trouvé la chaîne suivante :
+```
+Wubbalubbadubdub
+```
+
+Cela ressemblait fortement à un mot de passe ou à un indice. J’ai essayé d’utiliser cette chaîne comme mot de passe pour me connecter au serveur SSH, mais cela a échoué. En effet, le serveur SSH exigeait une clé RSA pour la connexion.
+
+![Analyse robots.txt](image/clue.txt.png)
+
+---
+
+#### **Étape 4 : Réflexion et leçons apprises**
+Après cet échec, voici ce que j’ai appris :
+1. **Liste de mots adaptée :** L’utilisation d’une wordlist spécifique pour Dirb a permis de découvrir des répertoires que Gobuster n’avait pas trouvé.
+2. **Analyse méthodique :** La découverte de `/robots.txt` m’a permis de progresser en obtenant un nouvel indice.
+3. **Persévérance :** Même si `Wubbalubbadubdub` n’était pas utilisable immédiatement, je savais qu’il pouvait être pertinent dans une autre partie du challenge.
+
+---
+
+### **4. Scan avec Nikto**
+Après avoir exploré `/robots.txt`, j’ai décidé de scanner le serveur avec **Nikto** pour découvrir des fichiers ou répertoires supplémentaires. Voici la commande utilisée :
+
+```bash
+nikto -h http://<IP-CIBLE>/
+```
+
+- **Résultats :** Nikto a révélé la présence d’un fichier `/login.php`, ce qui m’a permis de progresser.
+
+![Résultats Nikto](image/nikto.png)
 
 ---
 
@@ -55,9 +95,9 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
 - **Identifiants utilisés :**
   - **Nom d’utilisateur :** `R1ckRul3s`
   - **Mot de passe :** `Wubbalubbadubdub`
-- **Résultat :** Accès au panneau de contrôle.
+- **Résultat :** J’ai pu me connecter avec succès au fichier `/login.php` et accéder au panneau de contrôle.
 
-![Login panel](image/commandpanel.png)
+![Panneau de contrôle](image/commandpanel.png)
 
 ---
 
@@ -76,7 +116,8 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
   ```
 - **Résultat :** Shell interactif avec les permissions `www-data`.
 
-![Reverse Shell](image/lsreverseshell.png)
+![Reverse Shell](image/reverseshellcotercible.png)
+![Reverse Shell](image/reverseshellcoterattaque.png)
 
 ---
 
@@ -92,7 +133,7 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
   ```
 - **Résultat :** Accès root obtenu.
 
-![Root access](image/devenirroot+flag3.png)
+![Accès root](image/devenirroot+flag3.png)
 
 ---
 
@@ -105,7 +146,7 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
 ---
 
 ## **Résumé des Flags**
-1. **Flag 1 :** Contenu trouvé dans le fichier `fsocity.dic`.
+1. **Flag 1 :** Contenu trouvé dans le fichier robot.txt`.
 2. **Flag 2 :** Contenu du fichier `clue.txt`.
 3. **Flag 3 :** Contenu trouvé dans le répertoire `/root`.
 
@@ -119,20 +160,9 @@ Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Tout
 - **Reverse Shell** : Exploitation pour obtenir un shell interactif.
 - **Sudo** : Escalade de privilèges pour devenir root.
 
----
+![résumé_ctf](image/resuméctf.png)
 
 ## **Licence**
 Ce write-up est partagé à titre éducatif uniquement. Veuillez respecter les lois et ne pas utiliser ces techniques sans autorisation.
-```
 
----
 
-### Points à vérifier :
-1. **Vérifiez les noms exacts des images** : 
-   - Assurez-vous que les noms des fichiers correspondent exactement, y compris la casse (majuscules/minuscules) et l’extension (.png).
-2. **Images dans `image/`** : 
-   - Toutes vos images doivent être dans le dossier `image/`.
-3. **Rendu final** :
-   - Une fois ce texte ajouté, cliquez sur l'onglet **Preview** pour vérifier que tout fonctionne correctement.
-
-Si vous rencontrez encore des problèmes, envoyez-moi les erreurs ou comportements rencontrés !
