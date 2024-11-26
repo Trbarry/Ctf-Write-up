@@ -2,7 +2,9 @@
 # **CTF Write-Up: Pickle Rick**
 
 ## **Description**
-Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Toutes les étapes, outils, et captures d’écran sont inclus.
+Write-up détaillé pour résoudre le challenge *Pickle Rick* de TryHackMe. Toutes les étapes, outils, et captures d’écran sont inclus
+
+![pageweb](image/pagewebprincipale.png)
 
 ---
 
